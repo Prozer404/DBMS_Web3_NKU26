@@ -1,0 +1,77 @@
+:root {
+  --bg: #0a0e12;
+  --panel: #151b24;
+  --text: #e8edf4;
+  --muted: #8b9cb3;
+  --accent: #3ecf8e;
+  --accent2: #5eb8ff;
+  --danger: #ff6b6b;
+  --border: #2a3544;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+a { color: var(--accent2); }
+header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #121a22 0%, var(--bg) 100%);
+}
+header h1 { margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+header .sub { color: var(--muted); font-size: 0.8rem; }
+#userBar { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; font-size: 0.9rem; }
+#userBar .email { color: var(--accent); }
+button {
+  cursor: pointer; padding: 0.45rem 0.9rem; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 0.875rem;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: #0a0e12; font-weight: 600; }
+button.ghost { background: transparent; border-color: var(--muted); color: var(--muted); }
+nav {
+  display: flex; flex-wrap: wrap; gap: 0.2rem; padding: 0.4rem 1rem;
+  border-bottom: 1px solid var(--border); background: #0d1218;
+}
+nav button { border: none; background: transparent; color: var(--muted); border-radius: 6px; }
+nav button.active { color: var(--accent); background: rgba(62,207,142,0.12); }
+main { max-width: 1100px; margin: 0 auto; padding: 1rem 1.25rem 2rem; }
+.panel { display: none; }
+.panel.active { display: block; }
+.panel h2 { font-size: 0.95rem; color: var(--muted); font-weight: 500; margin: 0 0 0.75rem; }
+.card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 1rem; margin-bottom: 1rem;
+}
+.toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; align-items: flex-end; }
+.toolbar label { display: flex; flex-direction: column; font-size: 0.72rem; color: var(--muted); gap: 0.2rem; }
+.toolbar input, .toolbar select { padding: 0.4rem 0.55rem; border-radius: 6px; border: 1px solid var(--border); background: #0a0e12; color: var(--text); min-width: 6rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+th, td { border: 1px solid var(--border); padding: 0.35rem 0.45rem; text-align: left; vertical-align: top; }
+th { background: #0d1218; color: var(--muted); font-weight: 500; }
+.mono { font-family: ui-monospace, monospace; word-break: break-all; }
+#toast {
+  position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+  padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.85rem; max-width: 90vw;
+  display: none; z-index: 2000; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+#toast.show { display: block; }
+#toast.ok { background: rgba(62,207,142,0.95); color: #0a0e12; }
+#toast.err { background: rgba(255,107,107,0.95); color: #fff; }
+
+/* modal */
+#overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1000;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+#overlay.show { display: flex; }
+.modal-box {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  width: 100%; max-width: 400px; padding: 1.25rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-box h2 { margin: 0 0 1rem; font-size: 1.05rem; }
+.modal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.modal-tabs button { flex: 1; border-radius: 8px; }
+.modal-tabs button.active { border-color: var(--accent); color: var(--accent); }
+.form-row { margin-bottom: 0.75rem; }
+.form-row label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+.form-row input { width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: #0a0e12; color: var(--text); }
+.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
+button.small { padding: 0.2rem 0.45rem; font-size: 0.72rem; }
