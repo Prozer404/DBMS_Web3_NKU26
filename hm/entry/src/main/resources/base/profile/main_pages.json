@@ -1,0 +1,10 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/UserPage",
+    "pages/CurrencyPage",
+    "pages/TradingPairPage",
+    "pages/AssetPage",
+    "pages/OrderPage"
+  ]
+}
