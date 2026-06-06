@@ -239,15 +239,13 @@ def me_trades(uid: int = Depends(get_user_id), limit: int = Query(50, ge=1, le=2
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                """SELECT DISTINCT t.id, t.pair_id, t.maker_order_id, t.taker_order_id, t.price, t.amount,
-                          t.fee_amount, t.fee_currency, t.created_at
-                   FROM trades t
-                   WHERE EXISTS (
-                     SELECT 1 FROM `orders` o
-                     WHERE o.user_id = %s AND (o.id = t.maker_order_id OR o.id = t.taker_order_id)
-                   )
-                   ORDER BY t.id DESC LIMIT %s""",
-                (uid, limit),
+                """SELECT trade_id AS id, pair_id, base_currency, quote_currency,
+                          maker_order_id, taker_order_id, price, amount, fee_amount,
+                          fee_currency, created_at
+                   FROM v_user_trades
+                   WHERE maker_user_id = %s OR taker_user_id = %s
+                   ORDER BY trade_id DESC LIMIT %s""",
+                (uid, uid, limit),
             )
             rows = cur.fetchall()
     return [serialize_row(r) for r in rows]

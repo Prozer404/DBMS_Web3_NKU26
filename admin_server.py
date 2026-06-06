@@ -356,18 +356,15 @@ class KycPatch(BaseModel):
 def patch_kyc(kyc_id: int, body: KycPatch, _: None = Depends(verify_admin)) -> dict[str, Any]:
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE kyc_applications SET status = %s, reject_reason = %s, reviewer_id = %s WHERE id = %s",
-                (body.status, body.reject_reason, body.reviewer_id, kyc_id),
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(404, "记录不存在")
-            cur.execute("SELECT user_id FROM kyc_applications WHERE id = %s", (kyc_id,))
-            row = cur.fetchone()
-            uid = row["user_id"] if row else None
-            if uid is not None:
-                user_kyc = {0: 1, 1: 2, 2: 3}.get(body.status, 1)
-                cur.execute("UPDATE users SET kyc_status = %s WHERE id = %s", (user_kyc, uid))
+            try:
+                cur.execute(
+                    "CALL sp_review_kyc(%s, %s, %s, %s)",
+                    (kyc_id, body.status, body.reject_reason, body.reviewer_id),
+                )
+            except pymysql.err.OperationalError as e:
+                if e.args and e.args[0] == 1644:
+                    raise HTTPException(400, str(e.args[1])) from e
+                raise
     return {"ok": True, "id": kyc_id}
 
 
@@ -393,60 +390,17 @@ class DepositPatch(BaseModel):
 def patch_deposit(dep_id: int, body: DepositPatch, _: None = Depends(verify_admin)) -> dict[str, Any]:
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT id, user_id, currency, amount, status FROM deposits WHERE id = %s FOR UPDATE",
-                (dep_id,),
-            )
-            dep = cur.fetchone()
-            if not dep:
+            cur.execute("SELECT id FROM deposits WHERE id = %s FOR UPDATE", (dep_id,))
+            if not cur.fetchone():
                 raise HTTPException(404, "记录不存在")
-
-            old_status = int(dep["status"])
-            new_status = int(body.status)
-
-            # 首次置为「成功」时入账：更新/插入 assets + 写 ledger（避免重复入账）
-            if new_status == 1 and old_status != 1:
-                uid = int(dep["user_id"])
-                currency = str(dep["currency"])
-                amt = dep["amount"]
-
-                cur.execute(
-                    "SELECT id, balance, frozen_balance FROM assets WHERE user_id = %s AND currency = %s FOR UPDATE",
-                    (uid, currency),
-                )
-                asset = cur.fetchone()
-                if asset:
-                    cur.execute(
-                        "UPDATE assets SET balance = balance + %s WHERE id = %s",
-                        (amt, asset["id"]),
-                    )
-                else:
-                    cur.execute(
-                        "INSERT INTO assets (user_id, currency, balance, frozen_balance) VALUES (%s, %s, %s, 0)",
-                        (uid, currency, amt),
-                    )
-
-                cur.execute(
-                    "SELECT balance, frozen_balance FROM assets WHERE user_id = %s AND currency = %s",
-                    (uid, currency),
-                )
-                snap = cur.fetchone()
-                if not snap:
-                    raise HTTPException(500, "入账后未读到资产行")
-
-                cur.execute(
-                    "INSERT INTO ledger_entries (user_id, currency, amount, balance_after, frozen_balance_after, "
-                    "ref_type, ref_id, `type`) VALUES (%s, %s, %s, %s, %s, 'DEPOSIT', %s, 'RECHARGE')",
-                    (uid, currency, amt, snap["balance"], snap["frozen_balance"], dep_id),
-                )
 
             if body.tx_hash is not None:
                 cur.execute(
                     "UPDATE deposits SET status = %s, tx_hash = %s WHERE id = %s",
-                    (new_status, body.tx_hash, dep_id),
+                    (body.status, body.tx_hash, dep_id),
                 )
             else:
-                cur.execute("UPDATE deposits SET status = %s WHERE id = %s", (new_status, dep_id))
+                cur.execute("UPDATE deposits SET status = %s WHERE id = %s", (body.status, dep_id))
     return {"ok": True, "id": dep_id}
 
 
