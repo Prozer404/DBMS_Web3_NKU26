@@ -12,39 +12,33 @@
 
 ### 2. 准备数据库
 执行以下 SQL 文件：
-
-```bash
+```
 ./schema_tables.sql
 ```
 
 然后执行：
-
-```bash
+```
 ./seed_web3.sql
 ```
 
 ### 3. 安装 Python 依赖
 在项目根目录打开PowerShell，建议先创建虚拟环境：
-
-```bash
+```
 python -m venv .venv
 ```
 
 激活虚拟环境：
-
-```bash
+```
 .\.venv\Scripts\Activate.ps1
 ```
 
 > **注意**：如果 PowerShell 不允许执行脚本，可以先执行以下命令，然后再激活：
 >
-> ```bash
 > Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-> ```
+
 
 安装依赖：
-
-```bash
+```
 pip install -r requirements.txt
 ```
 
@@ -53,16 +47,15 @@ pip install -r requirements.txt
 
 ### 5. 启动后端服务
 在项目根目录执行：
-
-```bash
+```
 uvicorn admin_server:app --reload --host 127.0.0.1 --port 8080
 ```
 
 启动成功后，终端里应该能看到：
 
-```text
-Uvicorn running on http://127.0.0.1:8080
-```
+
+- Uvicorn running on http://127.0.0.1:8080
+
 
 ### 6. 打开演示页面
 浏览器打开以下地址：
